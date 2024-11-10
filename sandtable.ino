@@ -69,6 +69,8 @@ const int GCODE_BUFFER_SIZE = 32;
 // Configuration ends here. Everything beyond this point is for developers. ~ahill //
 /////////////////////////////////////////////////////////////////////////////////////
 
+#include <stdint.h>
+
 // THETA is exclusive to the Turtle API to keep track of the direction the Turtle should be going. ~ahill
 #ifdef TURTLE_API
 int THETA;
@@ -89,34 +91,34 @@ void step() {
   delayMicroseconds(PULSE_DELAY);
 }
 
-void stepDown(int steps) {
+void stepDown(uint32_t steps) {
   digitalWrite(A_DIR, LOW);
   digitalWrite(B_DIR, HIGH);
-  for(int i = 0; i < steps; i++) {
+  for(uint32_t i = 0; i < steps; i++) {
     step();
   }
 }
 
-void stepLeft(int steps) {
+void stepLeft(uint32_t steps) {
   digitalWrite(A_DIR, HIGH);
   digitalWrite(B_DIR, HIGH);
-  for(int i = 0; i < steps; i++) {
+  for(uint32_t i = 0; i < steps; i++) {
     step();
   }
 }
 
-void stepRight(int steps) {
+void stepRight(uint32_t steps) {
   digitalWrite(A_DIR, LOW);
   digitalWrite(B_DIR, LOW);
-  for(int i = 0; i < steps; i++) {
+  for(uint32_t i = 0; i < steps; i++) {
     step();
   }
 }
 
-void stepUp(int steps) {
+void stepUp(uint32_t steps) {
   digitalWrite(A_DIR, HIGH);
   digitalWrite(B_DIR, LOW);
-  for(int i = 0; i < steps; i++) {
+  for(uint32_t i = 0; i < steps; i++) {
     step();
   }
 }
@@ -126,12 +128,12 @@ void stepUp(int steps) {
 void moveTo(float x, float y) {
   float accumulator;
   float delta = x - X;
-  int distance;
+  uint32_t distance;
   float slope;
   if(delta == 0) {
     // Vertical Line
     delta = y - Y;
-    distance = (int)floor(abs(delta) * STEPS_PER_MM);
+    distance = (uint32_t)floor(abs(delta) * STEPS_PER_MM);
     if(delta > 0) {
       stepUp(distance);
     } else {
@@ -140,9 +142,9 @@ void moveTo(float x, float y) {
   } else {
     // Slope-Intercept Line
     accumulator = 0.0;
-    distance = (int)floor(abs(delta));
+    distance = (uint32_t)floor(abs(delta));
     slope = (y - Y) / abs(delta);
-    for(int i = 0; i < distance; i++) {
+    for(uint32_t i = 0; i < distance; i++) {
       if(delta > 0.0) {
         // FIXME: This doesn't account for partial steps! ~ahill
         stepLeft(floor(STEPS_PER_MM));
@@ -152,9 +154,9 @@ void moveTo(float x, float y) {
       accumulator += slope;
       if(abs(accumulator) >= 1.0) {
         if(accumulator > 0.0) {
-          stepUp((int)floor(abs(floor(accumulator)) * STEPS_PER_MM));
+          stepUp((uint32_t)floor(abs(floor(accumulator)) * STEPS_PER_MM));
         } else {
-          stepDown((int)floor(abs(floor(accumulator)) * STEPS_PER_MM));
+          stepDown((uint32_t)floor(abs(floor(accumulator)) * STEPS_PER_MM));
         }
         accumulator -= floor(accumulator);
       }
